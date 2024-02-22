@@ -1,6 +1,7 @@
 name: Weekly One-on-One Issue
 
 on:
+  workflow_dispatch:
   schedule:
   - cron: 0 8 * * 1  # Every Monday at 1am – https://crontab.guru
   
