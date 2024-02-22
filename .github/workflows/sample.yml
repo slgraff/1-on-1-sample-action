@@ -1,0 +1,44 @@
+name: Weekly One-on-One Issue
+
+on:
+  schedule:
+  - cron: 0 8 * * 1  # Every Monday at 1am – https://crontab.guru
+  
+  push:
+    branches:
+      - main
+  
+jobs:
+  daily_standup:
+    name: Weekly One-on-One
+    runs-on: ubuntu-latest
+    steps:
+      
+    - name: Get date of this Friday
+      id: date
+      run: echo "date=Weekly 1:1 $(date --date='this fri' '+%A %h %d, %Y')" >> "$GITHUB_OUTPUT"
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4.0.2
+      with:
+        node-version: 20
+      
+    # Get the title, labels, assignees, and body of the issue template at the path,
+    # .github/ISSUE_TEMPLATE/my_template.md, if available.
+    - uses: imjohnbo/extract-issue-template-fields@v1.0.1
+      id: extract
+      with:
+        path: .github/ISSUE_TEMPLATE/weekly-1-1.md
+      
+    # Create new issue with date, assignees, labels, title and body  
+    - name: issue-bot
+      uses: imjohnbo/issue-bot@v3.4.4
+      with:
+        title: ${{ steps.date.outputs.date }}
+        assignees: "slgraff" # GitHub handles without the @
+        labels: ${{ steps.extract.outputs.labels }}
+        body: ${{ steps.extract.outputs.body }}
+        pinned: false
+        close-previous: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
